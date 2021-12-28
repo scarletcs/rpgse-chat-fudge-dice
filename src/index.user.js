@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name        RPG.SE Chat Fudge Dice BETA
+// @name        RPG.SE Chat Fudge Dice
 // @namespace   https://github.com/spacemonaut/
 // @description Convert RPG.SE chat d6 to Fudge dice (dF) on Stack Exchange Chat
 // @grant       none
