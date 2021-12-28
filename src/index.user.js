@@ -501,6 +501,7 @@ class CssService {
       .fudge-menu input[type='color'] {
         background: none;
         border: 0;
+        cursor: pointer;
         margin: 0;
         padding: 0;
         width: 20px;
