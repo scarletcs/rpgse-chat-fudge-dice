@@ -1,0 +1,36 @@
+{
+  "name": "rpgse-chat-fudge-dice",
+  "version": "2.0.0",
+  "description": "Convert RPG.SE chat d6 to Fudge dice (dF) on Stack Exchange Chat",
+  "main": "src/index.user.js",
+  "scripts": {
+    "lint": "eslint *.js",
+    "lint:fix": "eslint"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/spacemonaut/rpgse-chat-fudge-dice.git"
+  },
+  "author": "spacemonaut",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/spacemonaut/rpgse-chat-fudge-dice/issues"
+  },
+  "homepage": "https://github.com/spacemonaut/rpgse-chat-fudge-dice#readme",
+  "devDependencies": {
+    "@babel/core": "^7.16.5",
+    "@babel/eslint-parser": "^7.16.5",
+    "@typescript-eslint/eslint-plugin": "^5.8.1",
+    "@typescript-eslint/parser": "^5.8.1",
+    "del": "^6.0.0",
+    "eslint": "^8.5.0",
+    "gulp": "^4.0.2",
+    "gulp-change": "^1.0.2",
+    "gulp-eslint": "^6.0.0",
+    "terser-webpack-plugin": "^5.3.0",
+    "ts-loader": "^9.2.6",
+    "typescript": "^4.5.4",
+    "webpack": "^5.65.0",
+    "webpack-stream": "^7.0.0"
+  }
+}
