@@ -5,7 +5,7 @@
 // @grant       none
 // @include     https://chat.stackexchange.com/rooms/*
 // @include     https://chat.stackexchange.com/transcript/*
-// @version     2.0.0
+// @version     2.0.1
 // @run-at      document-idle
 // @downloadURL https://github.com/spacemonaut/rpgse-chat-fudge-dice/raw/main/src/index.user.js
 // ==/UserScript==
