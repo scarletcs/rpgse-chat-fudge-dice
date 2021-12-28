@@ -7,7 +7,7 @@
 // @include     https://chat.stackexchange.com/transcript/*
 // @version     2.0.0
 // @run-at      document-idle
-// @downloadURL https://github.com/spacemonaut/rpgse-chat-fudge-dice/raw/main/dist/index.user.js
+// @downloadURL https://github.com/spacemonaut/rpgse-chat-fudge-dice/raw/main/src/index.user.js
 // ==/UserScript==
 
 
@@ -26,13 +26,13 @@
 function debounce(func, wait, immediate) {
   let timeout;
   return function() {
-  	let context = this, args = arguments;
-  	clearTimeout(timeout);
-  	timeout = setTimeout(function() {
-  		timeout = null;
-  		if (!immediate) func.apply(context, args);
-  	}, wait);
-  	if (immediate && !timeout) func.apply(context, args);
+    let context = this, args = arguments;
+    clearTimeout(timeout);
+    timeout = setTimeout(function() {
+      timeout = null;
+      if (!immediate) func.apply(context, args);
+    }, wait);
+    if (immediate && !timeout) func.apply(context, args);
   };
 }
 
@@ -185,7 +185,7 @@ class ChatUtil {
 }
 
 class Log {
-  static prefix = `🎲 RPG.SE Fudge Dice:`;
+  static get prefix() { return `🎲 RPG.SE Fudge Dice:`; }
 
   static error(errorMessage, innerError) {
     const message = `${Log.prefix} ${errorMessage}`;
@@ -289,7 +289,7 @@ class ChatService {
   init() {
     if (!ChatUtil.getChatElement()) {
       Log.error('Tried to initialise ChatService, but no chat element found!');
-      throw error;
+      throw Error('Failed to initialise ChatService');
     }
 
     // Mark the root chat element
@@ -346,13 +346,13 @@ class ChatService {
       die.setAttribute(HtmlName.DATA_D6_SCORE, d6score.toString());
       die.setAttribute(HtmlName.DATA_FUDGE_SCORE, fudgeScore.toString());
 
-      const symbol = document.createElement('span')
+      const symbol = document.createElement('span');
       symbol.classList.add(HtmlName.CLS_FUDGE_DIE_FACE_SYMBOL);
       symbol.innerHTML = fudgeDisplay;
 
       const face = document.createElement('div');
       face.classList.add(HtmlName.CLS_FUDGE_DIE_FACE);
-      face.title = `Rolled ${d6score}`
+      face.title = `Rolled ${d6score}`;
       face.append(symbol);
       
       die.appendChild(face);
@@ -418,7 +418,7 @@ class CssService {
     const colorsOn = `.${HtmlName.CLS_FUDGE_COLORS_ON}`;
     const fudgeDie = `.${HtmlName.CLS_FUDGE_DIE}`;
     const fudgeDieFace = `.${HtmlName.CLS_FUDGE_DIE_FACE}`;
-    const fudgeDieFaceSymbol = `.${HtmlName.CLS_FUDGE_DIE_FACE_SYMBOL}`
+    const fudgeDieFaceSymbol = `.${HtmlName.CLS_FUDGE_DIE_FACE_SYMBOL}`;
 
     return `
       ${root}:not(${fudgeOn}) ${fudgeDieFace} {
@@ -539,6 +539,7 @@ class FormComponent {
      * The onChange callback. Overwrite this to listen to changes.
      * @param {boolean} value The new value
      */
+    /* eslint-disable-next-line no-unused-vars */
     this.onChange = (value) => null;
   }
 
@@ -597,7 +598,7 @@ class ColorPickerComponent extends FormComponent {
       this.value = this.text.value;
     });
 
-    const label = document.createElement('span')
+    const label = document.createElement('span');
     label.innerText = labelText;
 
     this.element = document.createElement('label');
@@ -637,7 +638,7 @@ class ToggleComponent extends FormComponent {
       this.invokeChangeCallback();
     });
 
-    const label = document.createElement('span')
+    const label = document.createElement('span');
     label.innerText = labelText;
 
     this.element = document.createElement('label');
@@ -674,25 +675,25 @@ class ConfigMenuService {
       }
       this.userConfig.save();
       this.cssService.update();
-    }
+    };
 
     this.colorsOn.onChange = value => {
       this.userConfig.useColors = value;
       this.userConfig.save();
       this.cssService.update();
-    }
+    };
 
     this.plusColorInput.onChange = value => {
       this.userConfig.plusColor = value;
       this.userConfig.save();
       this.cssService.update();
-    }
+    };
 
     this.minusColorInput.onChange = value => {
       this.userConfig.minusColor = value;
       this.userConfig.save();
       this.cssService.update();
-    }
+    };
 
     this.createUi();
   }
@@ -740,7 +741,7 @@ class ConfigMenuService {
       this.colorsOn.element,
       this.plusColorInput.element,
       this.minusColorInput.element
-    )
+    );
     menu.appendChild(options);
 
     return menu;

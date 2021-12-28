@@ -1,15 +1,10 @@
 {
-  "files": [
-    "index.user.js"
-  ],
   "extends": [
     "eslint:recommended"
-  ],  
+  ],
   "parserOptions": {
     "ecmaVersion": 2020
   },
-  "parser": "@babel/eslint-parser",
-  "requireConfigFile": false,
   "env": {
     "browser": true,
     "es2020": true,

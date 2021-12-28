@@ -4,8 +4,8 @@
   "description": "Convert RPG.SE chat d6 to Fudge dice (dF) on Stack Exchange Chat",
   "main": "src/index.user.js",
   "scripts": {
-    "lint": "eslint *.js",
-    "lint:fix": "eslint"
+    "lint": "eslint",
+    "lint:fix": "eslint --fix"
   },
   "repository": {
     "type": "git",
