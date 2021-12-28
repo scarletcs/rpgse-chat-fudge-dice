@@ -5,7 +5,7 @@
 // @grant       none
 // @include     https://chat.stackexchange.com/rooms/*
 // @include     https://chat.stackexchange.com/transcript/*
-// @version     2.0.1
+// @version     2.0.2
 // @run-at      document-idle
 // @downloadURL https://github.com/spacemonaut/rpgse-chat-fudge-dice/raw/main/src/index.user.js
 // ==/UserScript==
@@ -203,7 +203,7 @@ class Log {
  */
 class UserConfig {
   constructor() {
-    this.store = 'userConfig';
+    this.store = 'fudgeConfig';
     this.useColors = false;
     this.plusColor = '#008800';
     this.minusColor = '#CC0000';
