@@ -5,7 +5,7 @@
 // @grant       none
 // @include     https://chat.stackexchange.com/rooms/*
 // @include     https://chat.stackexchange.com/transcript/*
-// @version     2.0.2
+// @version     2.0.3
 // @run-at      document-idle
 // @downloadURL https://github.com/spacemonaut/rpgse-chat-fudge-dice/raw/main/src/index.user.js
 // ==/UserScript==
@@ -149,6 +149,7 @@ class ChatUtil {
 
   /**
    * Check if the room is live, i.e. new messages will be arriving.
+   * @returns {boolean} Whether the page is live
    */
   static get isLive() {
     return this.inLiveRoom;
@@ -184,19 +185,39 @@ class ChatUtil {
   }
 }
 
+/**
+ * Handle console logging for the script.
+ */
 class Log {
-  static get prefix() { return `🎲 RPG.SE Fudge Dice:`; }
+  /**
+   * Add this app's log line prefix.
+   * @private
+   */
+  static addPrefix(message) {
+    const prefix = `[🎲 RPG.SE Fudge Dice]`;
+    return `${prefix} ${message}`;
+  }
 
-  static error(errorMessage, innerError) {
-    const message = `${Log.prefix} ${errorMessage}`;
+  static info(message) {
+    console.info(Log.addPrefix(message));
+  }
 
+  static error(message, innerError) {
     if (innerError) {
-      console.error(message, innerError);
+      console.error(Log.addPrefix(message), innerError);
     } else {
-      console.error(message);
+      console.error(Log.addPrefix(message));
     }
   }
 }
+
+/**
+ * @typedef {Object} SerializedConfig
+ * @property {boolean} useColors
+ * @property {string} plusColor
+ * @property {string} minusColor
+ * @property {string[]} rooms
+ */
 
 /**
  * Configuration store for the user's settings.
@@ -230,6 +251,7 @@ class UserConfig {
    * Save the current config
    */
   save() {
+    /** @type {SerializedConfig} */
     const config = {
       'useColors': this.useColors,
       'plusColor': this.plusColor,
@@ -245,6 +267,7 @@ class UserConfig {
    * @public
    */
   load() {
+    /** @type {SerializedConfig} */
     const config = JSON.parse(localStorage.getItem(this.store));
     this.useColors = config.useColors ?? this.useColors;
     this.plusColor = config.plusColor ?? this.plusColor;
@@ -663,6 +686,14 @@ class ConfigMenuService {
 
   /** Initialise the config menu service and create the UI. */
   init() {
+    this.createComponents();
+    this.createUi();
+  }
+
+  /**
+   * Create the backbone components used by the UI.
+   */
+  createComponents() {
     this.fudgeOn = new ToggleComponent('Use fudge dice here', this.userConfig.isActiveHere);
     this.colorsOn = new ToggleComponent('Color the fudge dice', this.userConfig.useColors);
     this.plusColorInput = new ColorPickerComponent('Plus color', this.userConfig.plusColor);
@@ -695,10 +726,11 @@ class ConfigMenuService {
       this.userConfig.save();
       this.cssService.update();
     };
-
-    this.createUi();
   }
 
+  /**
+   * Create the actual config menu UI.
+   */
   createUi() {
     const menuButton = this.createMenuButton();
     const menu = this.createMenu();
@@ -774,6 +806,8 @@ class Main {
 
     const configMenu = new ConfigMenuService(userConfig, cssManager);
     configMenu.init();
+
+    Log.info('Started!');
   }
 }
 
