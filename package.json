@@ -16,5 +16,12 @@
   "bugs": {
     "url": "https://github.com/spacemonaut/rpgse-chat-fudge-dice/issues"
   },
-  "homepage": "https://github.com/spacemonaut/rpgse-chat-fudge-dice#readme"
+  "homepage": "https://github.com/spacemonaut/rpgse-chat-fudge-dice#readme",
+  "devDependencies": {
+    "@babel/core": "^7.16.5",
+    "@babel/eslint-parser": "^7.16.5",
+    "@typescript-eslint/eslint-plugin": "^5.8.1",
+    "@typescript-eslint/parser": "^5.8.1",
+    "eslint": "^8.5.0"
+  }
 }
