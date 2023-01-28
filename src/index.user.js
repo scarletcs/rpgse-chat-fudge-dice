@@ -25,14 +25,16 @@
  */
 function debounce(func, wait, immediate) {
   let timeout;
+
   return function() {
-    let context = this, args = arguments;
     clearTimeout(timeout);
-    timeout = setTimeout(function() {
+
+    timeout = setTimeout(() => {
       timeout = null;
-      if (!immediate) func.apply(context, args);
+      if (!immediate) func.apply(this, arguments);
     }, wait);
-    if (immediate && !timeout) func.apply(context, args);
+
+    if (immediate && !timeout) func.apply(this, arguments);
   };
 }
 
@@ -40,7 +42,7 @@ function debounce(func, wait, immediate) {
  * @enum {number} Fudge score value
  * @readonly
  */
- const FudgeScore = Object.freeze({
+const FudgeScore = Object.freeze({
   Minus: -1,
   Zero: 0,
   Plus: 1,
@@ -90,29 +92,33 @@ class FudgeUtil {
 /**
  * Shared names for HTML/CSS classes, attributes, and variable names.
  */
-const HtmlName = Object.freeze({
+const HtmlClass = Object.freeze({
   /** @readonly */
-  CLS_FUDGE_ROOT: 'fudge-running',
+  FudgeRoot: 'fudge-running',
   /** @readonly */
-  CLS_FUDGE_ON: 'fudge--on',
+  FudgeOn: 'fudge--on',
   /** @readonly */
-  CLS_FUDGE_COLORS_ON: 'fudge-colors--on',
+  FudgeColorsOn: 'fudge-colors--on',
   /** @readonly */
-  CLS_FUDGE_DIE: 'fudge-die',
+  FudgeDie: 'fudge-die',
   /** @readonly */
-  CLS_FUDGE_DIE_FACE: 'fudge-die-face',
+  FudgeDieFace: 'fudge-die-face',
   /** @readonly */
-  CLS_FUDGE_DIE_FACE_SYMBOL: 'fudge-die-face-symbol',
+  FudgeDieFaceSymbol: 'fudge-die-face-symbol',
+});
 
+const HtmlAttribute = Object.freeze({
   /** @readonly */
-  DATA_D6_SCORE: 'data-d6-score',
+  DataD6Score: 'data-d6-score',
   /** @readonly */
-  DATA_FUDGE_SCORE: 'data-fudge-score',
+  DataFudgeScore: 'data-fudge-score',
+});
   
+const CssAttribute = Object.freeze({
   /** @readonly */
-  VAR_FUDGE_DICE_MINUS_COLOR: '--fudge-dice-minus-color',
+  FudgeDiceMinusColor: '--fudge-dice-minus-color',
   /** @readonly */
-  VAR_FUDGE_DICE_PLUS_COLOR: '--fudge-dice-plus-color',
+  FudgeDicePlusColor: '--fudge-dice-plus-color',
 });
 
 /**
@@ -122,6 +128,8 @@ const HtmlName = Object.freeze({
 class ChatUtil {
   /**
    * Check if we're in a live chat room
+   * 
+   * @public
    * @returns {boolean} Whether we're in a live chat room
    */
   static get inLiveRoom() {
@@ -130,6 +138,8 @@ class ChatUtil {
 
   /**
    * Check if we're in a transcript page
+   * 
+   * @public
    * @returns {boolean} Whether we're in a transcript page
    */
   static get inTranscript() {
@@ -138,6 +148,8 @@ class ChatUtil {
 
   /**
    * Check in we're in a conversation aka bookmark.
+   * 
+   * @public
    * @returns {boolean} Whether we're in a conversation/bookmark page
    */
   static get inConversation() {
@@ -149,12 +161,19 @@ class ChatUtil {
 
   /**
    * Check if the room is live, i.e. new messages will be arriving.
+   * 
+   * @public
    * @returns {boolean} Whether the page is live
    */
   static get isLive() {
     return this.inLiveRoom;
   }
 
+  /**
+   * Get the current room ID.
+   * 
+   * @public
+   */
   static get roomId() {
     // this split will turn into one of these for the Fate room:
     // ["", "room", "11"]
@@ -166,13 +185,17 @@ class ChatUtil {
   /**
    * Check to see if the chat room is on RPG.SE.
    * Other chat rooms don't have dice, so there's no point in running the script there.
+   * 
+   * @public
    */
   static chatroomIsOnRpgSe() {
     return document.querySelector('#footer-logo a:link')?.getAttribute('href')?.includes('rpg.stackexchange.com') ?? false;
   }
 
   /**
-   * Get the main chat element
+   * Get the main chat element.
+   * 
+   * @public
    * @returns {HTMLElement} The main chat element
    */
   static getChatElement() { 
@@ -186,28 +209,30 @@ class ChatUtil {
 }
 
 /**
- * Handle console logging for the script.
+ * Console logger for for the script.
+ * 
+ * @abstract
  */
 class Log {
+  /** @readonly */
+  static prefix = '[🎲 RPG.SE Fudge Dice]';
+
   /**
-   * Add this app's log line prefix.
-   * @private
+   * Log an informational message.
+   * 
+   * @param  {...any} message The message and any information to log.
    */
-  static addPrefix(message) {
-    const prefix = `[🎲 RPG.SE Fudge Dice]`;
-    return `${prefix} ${message}`;
+  static log(...message) {
+    console.log(Log.prefix, ...message);
   }
 
-  static info(message) {
-    console.info(Log.addPrefix(message));
-  }
-
-  static error(message, innerError) {
-    if (innerError) {
-      console.error(Log.addPrefix(message), innerError);
-    } else {
-      console.error(Log.addPrefix(message));
-    }
+  /**
+   * Log an error message.
+   * 
+   * @param  {...any} message The message and any information to log.
+   */
+  static error(...message) {
+    console.error(Log.prefix, ...message);
   }
 }
 
@@ -231,12 +256,20 @@ class UserConfig {
     this.rooms = ['8403', '11']; // Fate chat room, TRPG General chat
   }
 
+  /**
+   * Whether the script should be active in this room according to settings.
+   * 
+   * @public
+   * @readonly
+   */
   get isActiveHere() {
     return this.rooms.includes(ChatUtil.roomId);
   }
 
   /**
-   * Prime localStorage for use
+   * Prime localStorage for use.
+   * 
+   * @public
    */
   init() {
     if (!localStorage.getItem(this.store)) {
@@ -248,7 +281,9 @@ class UserConfig {
   }
 
   /**
-   * Save the current config
+   * Save the current config.
+   * 
+   * @public
    */
   save() {
     /** @type {SerializedConfig} */
@@ -262,7 +297,7 @@ class UserConfig {
   }
 
   /**
-   * Load the user's config
+   * Load the user's config.
    * 
    * @public
    */
@@ -279,6 +314,8 @@ class UserConfig {
    * Activate the current room.
    * 
    * Note this doesn't actually affect the page, just the settings.
+   * 
+   * @public
    */
   activateRoom() {
     if (this.isActiveHere) {
@@ -291,6 +328,8 @@ class UserConfig {
    * Deactivate the current room.
    * 
    * Note this doesn't actually affect the page, just the settings.
+   * 
+   * @public
    */
   deactivateRoom() {
     this.rooms = this.rooms.filter(id => id !== ChatUtil.roomId);
@@ -307,6 +346,7 @@ class ChatService {
 
   /**
    * Initialise chat message handling.
+   * 
    * @public
    */
   init() {
@@ -317,7 +357,7 @@ class ChatService {
 
     // Mark the root chat element
     const chat = ChatUtil.getChatElement();
-    chat.classList.add(HtmlName.CLS_FUDGE_ROOT);
+    chat.classList.add(HtmlClass.FudgeRoot);
 
     // Run a one-off scan.
     this.debouncedScan();
@@ -330,6 +370,8 @@ class ChatService {
 
   /**
    * Commence live scanning the chat for new messages.
+   * 
+   * @private
    */
   startLiveScan() {
     const observer = new MutationObserver((mutations, obs) => {
@@ -348,33 +390,34 @@ class ChatService {
   }
 
   /**
-   * Annotate any unconverted D6 values as fudge dice
+   * Annotate any unconverted D6 values as fudge dice.
+   * 
    * @public
    */
   scan() {
-    const dice = Array.from(document.querySelectorAll(`.six-sided-die:not(.${HtmlName.CLS_FUDGE_DIE})`));
+    const dice = Array.from(document.querySelectorAll(`.six-sided-die:not(.${HtmlClass.FudgeDie})`));
 
     dice.forEach(die => {
-      if (die.classList.contains(HtmlName.CLS_FUDGE_DIE)) {
+      if (die.classList.contains(HtmlClass.FudgeDie)) {
         // The die has somehow already been processed.
         return;
       }
 
-      die.classList.add(HtmlName.CLS_FUDGE_DIE);
+      die.classList.add(HtmlClass.FudgeDie);
 
       const d6score = Array.from(die.querySelectorAll('.dot')).map(dot => dot.textContent).filter(text => text.includes('•')).length;
       const fudgeScore = FudgeUtil.d6toFudge(d6score);
       const fudgeDisplay = FudgeUtil.displayScore(fudgeScore);
       
-      die.setAttribute(HtmlName.DATA_D6_SCORE, d6score.toString());
-      die.setAttribute(HtmlName.DATA_FUDGE_SCORE, fudgeScore.toString());
+      die.setAttribute(HtmlClass.DataD6Score, d6score.toString());
+      die.setAttribute(HtmlAttribute.DataFudgeScore, fudgeScore.toString());
 
       const symbol = document.createElement('span');
-      symbol.classList.add(HtmlName.CLS_FUDGE_DIE_FACE_SYMBOL);
+      symbol.classList.add(HtmlClass.FudgeDieFaceSymbol);
       symbol.innerHTML = fudgeDisplay;
 
       const face = document.createElement('div');
-      face.classList.add(HtmlName.CLS_FUDGE_DIE_FACE);
+      face.classList.add(HtmlClass.FudgeDieFace);
       face.title = `Rolled ${d6score}`;
       face.append(symbol);
       
@@ -384,7 +427,7 @@ class ChatService {
 }
 
 /**
- * The CSS manager is a service that handles the CSS embedded on the page.
+ * A service that handles the CSS embedded on the page.
  */
 class CssService {
   /**
@@ -396,7 +439,9 @@ class CssService {
   }
 
   /**
-   * Create the on-page CSS
+   * Create the on-page CSS.
+   * 
+   * @public
    */
   init() {
     this.css = document.createElement('style');
@@ -407,18 +452,21 @@ class CssService {
 
   /**
    * Update the CSS and on-page configuration.
+   * 
+   * @public
    */
   update() {
     this.css.innerHTML = this.getCssContent();
     
-    const root = document.querySelector(`.${HtmlName.CLS_FUDGE_ROOT}`);
-    this.setClass(root, HtmlName.CLS_FUDGE_ON, this.userConfig.isActiveHere);
-    this.setClass(root, HtmlName.CLS_FUDGE_COLORS_ON, this.userConfig.useColors);
+    const root = document.querySelector(`.${HtmlClass.FudgeRoot}`);
+    this.setClass(root, HtmlClass.FudgeOn, this.userConfig.isActiveHere);
+    this.setClass(root, HtmlClass.FudgeColorsOn, this.userConfig.useColors);
   }
 
   /**
    * Sets a class to present/hidden 
    * 
+   * @private
    * @param {HTMLElement} element the element to set the class on
    * @param {string} className The class name to add/remove
    * @param {boolean} condition Whether the class should be present
@@ -433,15 +481,17 @@ class CssService {
 
   /**
    * Get the CSS for this userscript
+   * 
+   * @private
    * @returns {string} A CSS file
    */
   getCssContent() {
-    const root = `.${HtmlName.CLS_FUDGE_ROOT}`;
-    const fudgeOn = `.${HtmlName.CLS_FUDGE_ON}`;
-    const colorsOn = `.${HtmlName.CLS_FUDGE_COLORS_ON}`;
-    const fudgeDie = `.${HtmlName.CLS_FUDGE_DIE}`;
-    const fudgeDieFace = `.${HtmlName.CLS_FUDGE_DIE_FACE}`;
-    const fudgeDieFaceSymbol = `.${HtmlName.CLS_FUDGE_DIE_FACE_SYMBOL}`;
+    const root = `.${HtmlClass.FudgeRoot}`;
+    const fudgeOn = `.${HtmlClass.FudgeOn}`;
+    const colorsOn = `.${HtmlClass.FudgeColorsOn}`;
+    const fudgeDie = `.${HtmlClass.FudgeDie}`;
+    const fudgeDieFace = `.${HtmlClass.FudgeDieFace}`;
+    const fudgeDieFaceSymbol = `.${HtmlClass.FudgeDieFaceSymbol}`;
 
     return `
       ${root}:not(${fudgeOn}) ${fudgeDieFace} {
@@ -471,22 +521,22 @@ class CssService {
         display: inline-block;
       }
 
-      ${root}${fudgeOn} ${fudgeDie}[${HtmlName.DATA_FUDGE_SCORE}='${FudgeScore.Minus}'] {
-        color: var(${HtmlName.VAR_FUDGE_DICE_MINUS_COLOR});
+      ${root}${fudgeOn} ${fudgeDie}[${HtmlAttribute.DataFudgeScore}='${FudgeScore.Minus}'] {
+        color: var(${CssAttribute.FudgeDiceMinusColor});
       }
 
-      ${root}${fudgeOn} ${fudgeDie}[${HtmlName.DATA_FUDGE_SCORE}='${FudgeScore.Plus}'] {
-        color: var(${HtmlName.VAR_FUDGE_DICE_PLUS_COLOR});
+      ${root}${fudgeOn} ${fudgeDie}[${HtmlAttribute.DataFudgeScore}='${FudgeScore.Plus}'] {
+        color: var(${CssAttribute.FudgeDicePlusColor});
       }
 
       ${root}${fudgeOn} {
-        ${HtmlName.VAR_FUDGE_DICE_PLUS_COLOR}: inherit;
-        ${HtmlName.VAR_FUDGE_DICE_MINUS_COLOR}: inherit;
+        ${CssAttribute.FudgeDicePlusColor}: inherit;
+        ${CssAttribute.FudgeDiceMinusColor}: inherit;
       }
 
       ${root}${fudgeOn}${colorsOn} {
-        ${HtmlName.VAR_FUDGE_DICE_PLUS_COLOR}: ${this.userConfig.plusColor};
-        ${HtmlName.VAR_FUDGE_DICE_MINUS_COLOR}: ${this.userConfig.minusColor};
+        ${CssAttribute.FudgeDicePlusColor}: ${this.userConfig.plusColor};
+        ${CssAttribute.FudgeDiceMinusColor}: ${this.userConfig.minusColor};
       }
 
       .fudge-menu-button {
@@ -554,6 +604,11 @@ class CssService {
   }
 }
 
+/**
+ * A generic form component.
+ * 
+ * @abstract
+*/
 class FormComponent {
   constructor() {
     /** @type {HTMLElement} */
@@ -563,23 +618,27 @@ class FormComponent {
      * The onChange callback. Overwrite this to listen to changes.
      * @param {boolean} value The new value
      */
-    /* eslint-disable-next-line no-unused-vars */
-    this.onChange = (value) => null;
+    this.onChange = () => null;
   }
 
   /**
    * Alert listeners to a change.
    * 
-   * @private
+   * @protected
    */
   invokeChangeCallback() {
     this.onChange(this.value);
   }
 }
 
+/**
+ * A color picker for setting fudge dice colors.
+ */
 class ColorPickerComponent extends FormComponent {
   /**
    * Get or set the value of this color picker.
+   * 
+   * @public
    * @returns {string} The color value
    */
   get value() {
@@ -633,10 +692,15 @@ class ColorPickerComponent extends FormComponent {
   }
 }
 
+/**
+ * A checkbox for toggling settings.
+ */
 class ToggleComponent extends FormComponent {
   /**
    * Get or set the value of this toggle component.
-   * @returns {string} The toggle value
+   * 
+   * @public
+   * @returns {boolean} The toggle value
    */
   get value() {
     return this.input.checked;
@@ -651,6 +715,7 @@ class ToggleComponent extends FormComponent {
 
   /**
    * Create a new toggle component.
+   * 
    * @param {string} labelText The text for this element
    * @param {boolean} defaultValue The default toggle value
    */
@@ -673,9 +738,13 @@ class ToggleComponent extends FormComponent {
   }
 }
 
+/**
+ * Manager for the fudge dice configuration menu.
+ */
 class ConfigMenuService {
   /**
    * Create a new config menu service.
+   * 
    * @param {UserConfig} userConfig The user configuration
    * @param {CssService} cssService The css service
    */
@@ -684,7 +753,11 @@ class ConfigMenuService {
     this.cssService = cssService;
   }
 
-  /** Initialise the config menu service and create the UI. */
+  /**
+   * Initialise the config menu service and create the UI.
+   * 
+   * @public
+   */
   init() {
     this.createComponents();
     this.createUi();
@@ -692,6 +765,8 @@ class ConfigMenuService {
 
   /**
    * Create the backbone components used by the UI.
+   * 
+   * @private
    */
   createComponents() {
     this.fudgeOn = new ToggleComponent('Use fudge dice here', this.userConfig.isActiveHere);
@@ -730,6 +805,8 @@ class ConfigMenuService {
 
   /**
    * Create the actual config menu UI.
+   * 
+   * @private
    */
   createUi() {
     const menuButton = this.createMenuButton();
@@ -748,6 +825,8 @@ class ConfigMenuService {
 
   /**
    * Create the element that opens/closes the menu.
+   * 
+   * @private
    */
   createMenuButton() {
     const button = document.createElement('a');
@@ -758,6 +837,8 @@ class ConfigMenuService {
 
   /**
    * Create the main menu UI element.
+   * 
+   * @private
    */
   createMenu() {
     const menu = document.createElement('section');
@@ -787,7 +868,8 @@ class ConfigMenuService {
  */
 class Main {
   /**
-   * Start the script
+   * Start the script.
+   * 
    * @public
    */
   static start() {
@@ -807,7 +889,7 @@ class Main {
     const configMenu = new ConfigMenuService(userConfig, cssManager);
     configMenu.init();
 
-    Log.info('Started!');
+    Log.log('Started!');
   }
 }
 
