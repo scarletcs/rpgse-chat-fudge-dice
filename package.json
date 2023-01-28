@@ -9,14 +9,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/scarletcs/rpgse-chat-fudge-dice.git"
+    "url": "git+https://github.com/spacemonaut/rpgse-chat-fudge-dice.git"
   },
-  "author": "scarletcs",
+  "author": "spacemonaut",
   "license": "UNLICENSED",
   "bugs": {
-    "url": "https://github.com/scarletcs/rpgse-chat-fudge-dice/issues"
+    "url": "https://github.com/spacemonaut/rpgse-chat-fudge-dice/issues"
   },
-  "homepage": "https://github.com/scarletcs/rpgse-chat-fudge-dice#readme",
+  "homepage": "https://github.com/spacemonaut/rpgse-chat-fudge-dice#readme",
   "devDependencies": {
     "eslint": "^8.32.0"
   }
